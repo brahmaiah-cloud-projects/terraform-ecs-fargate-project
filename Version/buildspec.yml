@@ -1,1 +1,21 @@
+version: 0.2
 
+phases:
+
+    pre_build:
+      commands:
+        - aws ecr get-login-password --region ap-south-2 | docker login --username AWS --password-stdin 405830499205.dkr.ecr.ap-south-2.amazonaws.com
+
+    build: 
+      commands: 
+        - docker build -t brahmaiah-nginx .
+        - docker tag brahmaiah-nginx:latest 405830499205.dkr.ecr.ap-south-2.amazonaws.com/brahmaiah-nginx:latest
+
+    post_build:
+      commands: 
+        - docker push 405830499205.dkr.ecr.ap-south-2.amazonaws.com/brahmaiah-nginx:latest
+        - printf '[{"name":"nginx","imageUri":"405830499205.dkr.ecr.ap-south-2.amazonaws.com/brahmaiah-nginx:latest"}]' > imagedefinitions.json 
+
+artifacts:
+  files:
+    - imagedefinitions.json
